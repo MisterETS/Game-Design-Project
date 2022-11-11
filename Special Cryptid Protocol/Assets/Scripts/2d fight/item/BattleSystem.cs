@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using UnityEngine.UIElements;
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
@@ -12,6 +12,7 @@ public class BattleSystem : MonoBehaviour
 
 	public GameObject playerPrefab;
 	public GameObject enemyPrefab;
+	public GameObject panel;
 
 	public Transform playerBattleStation;
 	public Transform enemyBattleStation;
@@ -26,11 +27,17 @@ public class BattleSystem : MonoBehaviour
 
 	public BattleState state;
 
-	
+    public int numofattcks = 0;
+    public int numofobst = 0;
 
-	private int Checker = 0;
+    private int Checker = 0;
+	public int checkme = 0;
 
     public GameObject Heart;
+    public GameObject Obst1;
+    public GameObject Obst2;
+    public GameObject Obst3;
+	public GameObject enemybattle;
     private Vector3 Startingpos;
 
 
@@ -91,39 +98,78 @@ public class BattleSystem : MonoBehaviour
 
 	IEnumerator EnemyTurn()
 	{
+		bool isDead;
+		numofattcks = 0;
 		int CurrentHealth = playerUnit.currentHP;
 		dialogueText.text = enemyUnit.unitName + " attacks!";
-        Startingpos = new Vector3(-6, 2, 423);
+        Startingpos = new Vector3(1, 1, 1);
         transform.position = Startingpos;
 		MovePos = Startingpos;
-		MaxX = 100;
-		MaxY = 100;
-		MinX = -100;
-		MinY = -100;
+		MaxX = 15;
+		MaxY = 28;
+		MinX = -33;
+		MinY = -12;
+		Sensitivity = 2;
+		numofobst++;
         Checker = 1;
+		checkme = 1;
+        if (numofobst == 1)
+        {
+            Obst1.SetActive(true);
+            Obst2.SetActive(false);
+            Obst3.SetActive(false);
+
+        }
+        else if (numofobst == 2)
+        {
+            Obst1.SetActive(false);
+            Obst2.SetActive(true);
+            Obst3.SetActive(false);
+
+        }
+		else if(numofobst == 3)
+        {
+            Obst1.SetActive(false);
+            Obst2.SetActive(false);
+            Obst3.SetActive(true);
+
+        }
+
+        enemybattle.SetActive(false);
 
 
+        yield return new WaitForSeconds(10f);
 
+        enemybattle.SetActive(true);
+        Checker = 0;
+		checkme = 0;
 
-        yield return new WaitForSeconds(30f);
-		Checker = 0;	
-
-		bool isDead = playerUnit.TakeDamage(enemyUnit.damage);
-
-		playerHUD.SetHP(playerUnit.currentHP);
-
-		yield return new WaitForSeconds(1f);
-
-		if(isDead)
+		if (numofobst == 3)
 		{
-			state = BattleState.LOST;
-			EndBattle(); 
-			
-		} else
-		{
-			state = BattleState.PLAYERTURN;
-			PlayerTurn();
+			numofobst = 0;
 		}
+
+		for(int i = 0; i < numofattcks; i++)
+		{
+            isDead = playerUnit.TakeDamage(enemyUnit.damage);
+            playerHUD.SetHP(playerUnit.currentHP);
+            if (isDead)
+            {
+                state = BattleState.LOST;
+				numofattcks = 0;
+                EndBattle();
+
+            }
+        }
+
+
+		
+
+		
+		
+		state = BattleState.PLAYERTURN;
+		PlayerTurn();
+		
 
 	}
 
@@ -143,16 +189,19 @@ public class BattleSystem : MonoBehaviour
 		dialogueText.text = "Choose an action:";
 	}
 
-	IEnumerator PlayerHeal()
+	IEnumerator Talk()
 	{
-		playerUnit.Heal(5);
+		//playerUnit.Heal(0);
 
-		playerHUD.SetHP(playerUnit.currentHP);
-		dialogueText.text = "You feel renewed strength!";
+		//playerHUD.SetHP(playerUnit.currentHP);
+		dialogueText.text = "Wait.... you want to talk to me?";
 
-		yield return new WaitForSeconds(2f);
-
-		state = BattleState.ENEMYTURN;
+		yield return new WaitForSeconds(5f);
+        // if we have glasses
+        //dialogueText.text = "Wait.... you want to talk to me?";
+        //if we dont have glasses
+        //dialogueText.text = "Stop looking at me!";
+        state = BattleState.ENEMYTURN;
 		StartCoroutine(EnemyTurn());
 	}
 
@@ -164,18 +213,28 @@ public class BattleSystem : MonoBehaviour
 		StartCoroutine(PlayerAttack());
 	}
 
-	public void OnHealButton()
+	public void OnTalkButton()
 	{
 		if (state != BattleState.PLAYERTURN)
 			return;
 
-		StartCoroutine(PlayerHeal());
+		StartCoroutine(Talk());
 	}
 
 	private void FixedUpdate()
 	{
+		if (Checker == 0)
+		{
+			panel.SetActive(false);
+            
+
+        }
+
+
 		if (Checker == 1)
 		{
+			
+            panel.SetActive(true);
             float horizontal = Input.GetAxis("Horizontal") * Sensitivity;
             float vertical = Input.GetAxis("Vertical") * Sensitivity;
             MovePos.x += horizontal;
