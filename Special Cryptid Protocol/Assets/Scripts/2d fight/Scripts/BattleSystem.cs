@@ -3,16 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEditor.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
 public class BattleSystem : MonoBehaviour
 {
-
-	public GameObject playerPrefab;
+    
+    public GameObject playerPrefab;
 	public GameObject enemyPrefab;
 	public GameObject panel;
+	public GameObject itempanel;
+
+	public ButtonEditor button;
+	public TextMeshProUGUI b1Text;
+
 
 	public Transform playerBattleStation;
 	public Transform enemyBattleStation;
@@ -31,7 +40,8 @@ public class BattleSystem : MonoBehaviour
     public int numofobst = 0;
 
     private int Checker = 0;
-	public int checkme = 0;
+    public int checkme = 0;
+	private int talkmeter= 0;
 
     public GameObject Heart;
     public GameObject Obst1;
@@ -49,11 +59,22 @@ public class BattleSystem : MonoBehaviour
     public int MinX ;
     public int MinY ;
 
+	private void Awake()
+	{
+		//GameObject myGameObject;
+		//myGameObject = GameObject.FindGameObjectWithTag("AllManager");
+		
 
-    // Start is called before the first frame update
-    void Start()
+    }
+	// Start is called before the first frame update
+	void Start()
     {
-		state = BattleState.START;
+		if (MainMenuController.Instance.ListOfItemsEncounter1[1] == true)
+		{
+			b1Text.text = "Gun";
+		}
+        itempanel.SetActive(false);
+        state = BattleState.START;
 		StartCoroutine(SetupBattle());
     }
 
@@ -76,8 +97,30 @@ public class BattleSystem : MonoBehaviour
 		PlayerTurn();
 	}
 
+	IEnumerator GunAttack()
+	{
+        bool isDead = enemyUnit.TakeDamage(playerUnit.damage * 3);
+
+        enemyHUD.SetHP(enemyUnit.currentHP);
+        dialogueText.text = "The attack is successful!";
+
+        yield return new WaitForSeconds(2f);
+
+        if (isDead)
+        {
+            state = BattleState.WON;
+            EndBattle();
+        }
+        else
+        {
+            state = BattleState.ENEMYTURN;
+            StartCoroutine(EnemyTurn());
+        }
+    }
+
 	IEnumerator PlayerAttack()
 	{
+		
 		bool isDead = enemyUnit.TakeDamage(playerUnit.damage);
 
 		enemyHUD.SetHP(enemyUnit.currentHP);
@@ -112,7 +155,8 @@ public class BattleSystem : MonoBehaviour
 		Sensitivity = 2;
 		numofobst++;
         Checker = 1;
-		checkme = 1;
+        checkme = 1;
+		
         if (numofobst == 1)
         {
             Obst1.SetActive(true);
@@ -143,6 +187,7 @@ public class BattleSystem : MonoBehaviour
         enemybattle.SetActive(true);
         Checker = 0;
 		checkme = 0;
+		
 
 		if (numofobst == 3)
 		{
@@ -177,10 +222,12 @@ public class BattleSystem : MonoBehaviour
 	{
 		if(state == BattleState.WON)
 		{
-			dialogueText.text = "You won the battle!";
+			dialogueText.text = "You won the battle!, you succesfully killed the entity though perhaps there was another way?";
 		} else if (state == BattleState.LOST)
 		{
-			dialogueText.text = "You were defeated.";
+			dialogueText.text = "You were defeated, retreat for now";
+			waitup();
+			SceneManager.LoadScene("Scene1Encounter1");
 		}
 	}
 
@@ -189,18 +236,51 @@ public class BattleSystem : MonoBehaviour
 		dialogueText.text = "Choose an action:";
 	}
 
+	IEnumerator waitup()
+	{
+        yield return new WaitForSeconds(3f);
+
+    }
+
 	IEnumerator Talk()
 	{
 		//playerUnit.Heal(0);
-
+		if (MainMenuController.Instance.ListOfItemsEncounter1[1] == false)
+		{
+            dialogueText.text = "Stop looking at me!";
+        }
+		else if(MainMenuController.Instance.ListOfItemsEncounter1[1] == true)
+		{
+            
+			talkmeter++;
+			if(talkmeter == 1)
+			{
+                dialogueText.text = "Wait.... you want to talk to me?";
+                yield return new WaitForSeconds(5f);
+            }
+			else if(talkmeter == 2)
+			{
+                dialogueText.text = "You just want to talk, ok lets talk.";
+                yield return new WaitForSeconds(5f);
+            }
+            else if(talkmeter == 3)
+			{
+                dialogueText.text = "Ok , you make sense, ill go back to my ce- i mean room, just dont forget to write that on your report.";
+				yield return new WaitForSeconds(7f);
+				MainMenuController.Instance.PeacefulRoute[0] = true;
+				dialogueText.text = "You have peacefully resolved this encounter! And you did it peacefully, though know that it isnt always possible to do so, lets continue through this facility";
+				yield return new WaitForSeconds(10f);
+				SceneManager.LoadScene("Scene5Encounter2");
+            }
+        }
 		//playerHUD.SetHP(playerUnit.currentHP);
-		dialogueText.text = "Wait.... you want to talk to me?";
+		
 
 		yield return new WaitForSeconds(5f);
         // if we have glasses
         //dialogueText.text = "Wait.... you want to talk to me?";
         //if we dont have glasses
-        //dialogueText.text = "Stop looking at me!";
+        //
         state = BattleState.ENEMYTURN;
 		StartCoroutine(EnemyTurn());
 	}
@@ -221,7 +301,25 @@ public class BattleSystem : MonoBehaviour
 		StartCoroutine(Talk());
 	}
 
-	private void FixedUpdate()
+    public void Gun()
+    {
+        if (state != BattleState.PLAYERTURN)
+		{
+            return;
+        }
+		else if (MainMenuController.Instance.ListOfItemsEncounter1[1] == true)
+		{
+            StartCoroutine(GunAttack());
+        }
+		else
+		{
+			dialogueText.text = "I have nothing to use";
+			return;
+		}
+        
+    }
+
+    private void FixedUpdate()
 	{
 		if (Checker == 0)
 		{
