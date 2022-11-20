@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Scene1Encounter1.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/NewFighting.unity
+    path: Assets/Scenes/Scene2Fight1.unity
     guid: dec1f10273b26c54a933aa190a5b4708
   - enabled: 1
     path: Assets/Scenes/Scene3Violent.unity
@@ -17,4 +17,34 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Scene4Peaceful.unity
     guid: 257d64059c663914891edd42c7c75969
+  - enabled: 1
+    path: Assets/Scenes/Scene5Encounter2.unity
+    guid: 100a42c7eef2c9a40a78d47f1ada15db
+  - enabled: 1
+    path: Assets/Scenes/Scene6Fight2.unity
+    guid: 2a8d11728cf16ac4798bdddae35446bc
+  - enabled: 1
+    path: Assets/Scenes/Scene7PeacefulPath.unity
+    guid: c4c27a9e894c5534588672fe7f741ab9
+  - enabled: 1
+    path: Assets/Scenes/Scene9Encounter3ContainmentRoom.unity
+    guid: 8d8a918177ee4784a830517ffdf7c307
+  - enabled: 1
+    path: Assets/Scenes/Scene10Fight3.unity
+    guid: ed2d7dbb03249a14fb557419b31a9b2d
+  - enabled: 1
+    path: Assets/Scenes/Scene11MainHall.unity
+    guid: f76c54d544828bf41a3c5aee7bee0737
+  - enabled: 1
+    path: Assets/Scenes/Scene12Generator.unity
+    guid: f681cfb5d669a904c90d5a5d14fcdfd8
+  - enabled: 1
+    path: Assets/Scenes/ViolentEnding.unity
+    guid: 593aa08d07fa42847b749224de6327b1
+  - enabled: 1
+    path: Assets/Scenes/ContainmentEnding.unity
+    guid: dcbc32465edb4ab43b5099ca38582336
+  - enabled: 1
+    path: Assets/Scenes/EscapeEnding.unity
+    guid: 115e9dbd6f0247d4ba3182f18f4245be
   m_configObjects: {}

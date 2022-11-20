@@ -24,6 +24,19 @@ public class MainMenuController : MonoBehaviour
         ListOfItemsEncounter1[3] = false;
         ListOfItemsEncounter1[4] = false;
 
+        ListOfItemsEncounter2[0] = false;
+        ListOfItemsEncounter2[1] = false;
+        ListOfItemsEncounter2[2] = false;
+        ListOfItemsEncounter2[3] = false;
+        ListOfItemsEncounter2[4] = false;
+
+
+        ListOfItemsEncounter3[0] = false;
+        ListOfItemsEncounter3[1] = false;
+        ListOfItemsEncounter3[2] = false;
+        ListOfItemsEncounter3[3] = false;
+        ListOfItemsEncounter3[4] = false;
+
         PeacefulRoute[0] = false;
         PeacefulRoute[1] = false;
         PeacefulRoute[2] = false;

@@ -21,6 +21,8 @@ public class BattleSystem : MonoBehaviour
 
 	public ButtonEditor button;
 	public TextMeshProUGUI b1Text;
+	public TextMeshProUGUI b2Text;
+	public TextMeshProUGUI b3Text;
 
 
 	public Transform playerBattleStation;
@@ -72,6 +74,10 @@ public class BattleSystem : MonoBehaviour
 		if (MainMenuController.Instance.ListOfItemsEncounter1[1] == true)
 		{
 			b1Text.text = "Gun";
+		}
+		if (MainMenuController.Instance.ListOfItemsEncounter2[1] == true)
+		{
+			b2Text.text = "H.S.D";
 		}
         itempanel.SetActive(false);
         state = BattleState.START;
@@ -223,11 +229,39 @@ public class BattleSystem : MonoBehaviour
 		if(state == BattleState.WON)
 		{
 			dialogueText.text = "You won the battle!, you succesfully killed the entity though perhaps there was another way?";
-		} else if (state == BattleState.LOST)
+            StartCoroutine(waitup());
+            Scene scene1 = SceneManager.GetActiveScene();
+			MainMenuController.Instance.ViolentRoute[0] = true;
+            if (scene1.name == "Scene2Fight1")
+            {
+                SceneManager.LoadScene("Scene5Encounter2");
+            }
+            else if (scene1.name == "Scene6Fight2")
+            {
+                SceneManager.LoadScene("Scene9Encounter3ContainmentRoom");
+            }
+            else if (scene1.name == "Scene10Fight3")
+            {
+                SceneManager.LoadScene("ViolentEnding");
+            }
+        } else if (state == BattleState.LOST)
 		{
 			dialogueText.text = "You were defeated, retreat for now";
 			waitup();
-			SceneManager.LoadScene("Scene1Encounter1");
+			Scene scene = SceneManager.GetActiveScene();
+			if(scene.name == "Scene2Fight1")
+			{
+				SceneManager.LoadScene("Scene1Encounter1");
+			}
+			else if(scene.name == "Scene6Fight2")
+			{
+                SceneManager.LoadScene("Scene5Encounter2");
+            }
+			else if(scene.name == "Scene10Fight3")
+			{
+                SceneManager.LoadScene("Scene9Encounter3ContainmentRoom");
+            }
+			
 		}
 	}
 
@@ -238,7 +272,7 @@ public class BattleSystem : MonoBehaviour
 
 	IEnumerator waitup()
 	{
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(5f);
 
     }
 
@@ -257,21 +291,17 @@ public class BattleSystem : MonoBehaviour
 			{
                 dialogueText.text = "Wait.... you want to talk to me?";
                 yield return new WaitForSeconds(5f);
-            }
-			else if(talkmeter == 2)
-			{
                 dialogueText.text = "You just want to talk, ok lets talk.";
                 yield return new WaitForSeconds(5f);
-            }
-            else if(talkmeter == 3)
-			{
-                dialogueText.text = "Ok , you make sense, ill go back to my ce- i mean room, just dont forget to write that on your report.";
+				dialogueText.text = "Ok , you make sense, ill go back to my ce- i mean room, just dont forget to write that on your report.";
 				yield return new WaitForSeconds(7f);
 				MainMenuController.Instance.PeacefulRoute[0] = true;
 				dialogueText.text = "You have peacefully resolved this encounter! And you did it peacefully, though know that it isnt always possible to do so, lets continue through this facility";
 				yield return new WaitForSeconds(10f);
+				MainMenuController.Instance.PeacefulRoute[0] = true;
 				SceneManager.LoadScene("Scene5Encounter2");
             }
+			
         }
 		//playerHUD.SetHP(playerUnit.currentHP);
 		
@@ -307,9 +337,29 @@ public class BattleSystem : MonoBehaviour
 		{
             return;
         }
-		else if (MainMenuController.Instance.ListOfItemsEncounter1[1] == true)
+		else if (MainMenuController.Instance.ListOfItemsEncounter1[0] == true)
 		{
-            StartCoroutine(GunAttack());
+            Scene scene2 = SceneManager.GetActiveScene();
+            if (scene2.name == "Scene6Fight2")
+			{
+				dialogueText.text = "I dont have any more ammo for the gun!";
+				StartCoroutine(waitup());
+				return;
+			}
+			bool Apused = playerUnit.APUse(6);
+            playerHUD.SetAP(playerUnit.currentAP);
+            if (Apused)
+			{
+				itempanel.SetActive(false);
+                StartCoroutine(GunAttack());
+            }
+			else
+			{
+				dialogueText.text = "Im too tired to do that";
+				StartCoroutine(waitup());
+				return;
+			}
+           
         }
 		else
 		{
@@ -317,6 +367,49 @@ public class BattleSystem : MonoBehaviour
 			return;
 		}
         
+    }
+
+    public void HSD()
+    {
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
+        else if (MainMenuController.Instance.ListOfItemsEncounter2[0] == true)
+        {
+            Scene scene2 = SceneManager.GetActiveScene();
+            if (scene2.name == "Scene10Fight3")
+            {
+                dialogueText.text = "Its fried, guess it was only limited use...";
+                StartCoroutine(waitup());
+                return;
+            }
+            bool Apused = playerUnit.APUse(6);
+            playerHUD.SetAP(playerUnit.currentAP);
+            if (Apused)
+            {
+                itempanel.SetActive(false);
+                StartCoroutine(GunAttack());
+            }
+            else
+            {
+                dialogueText.text = "Im too tired to do that";
+                StartCoroutine(waitup());
+                return;
+            }
+
+        }
+        else
+        {
+            dialogueText.text = "I have nothing to use";
+            return;
+        }
+
+    }
+
+    public UnityEngine.SceneManagement.Scene GetActiveScene()
+    {
+        return UnityEngine.SceneManagement.SceneManager.GetActiveScene();
     }
 
     private void FixedUpdate()

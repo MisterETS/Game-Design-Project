@@ -12,6 +12,8 @@ public class Unit : MonoBehaviour
 
 	public int maxHP;
 	public int currentHP;
+	public int maxAP;
+	public int currentAP;
 
 	public bool TakeDamage(int dmg)
 	{
@@ -23,7 +25,18 @@ public class Unit : MonoBehaviour
 			return false;
 	}
 
-	public void Heal(int amount)
+    public bool APUse(int ap)
+    {
+		if (currentAP - ap <= 0) return false;
+        currentAP -= ap;
+
+        if (currentAP <= 0)
+            return false;
+        else
+            return true;
+    }
+
+    public void Heal(int amount)
 	{
 		currentHP += amount;
 		if (currentHP > maxHP)
