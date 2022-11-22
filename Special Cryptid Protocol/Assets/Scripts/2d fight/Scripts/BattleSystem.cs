@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEditor.UI;
+
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using Unity.VisualScripting;
+using static Unity.VisualScripting.Member;
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
@@ -19,8 +20,18 @@ public class BattleSystem : MonoBehaviour
 	public GameObject panel;
 	public GameObject itempanel;
 
-	public ButtonEditor button;
-	public TextMeshProUGUI b1Text;
+    public AudioSource sourceFlame;
+    public AudioSource sourceGun;
+    public AudioSource sourceHSD;
+    public AudioSource attack;
+    public AudioClip clipFlame;
+    public AudioClip GUN;
+    public AudioClip HSDso;
+    public AudioClip Attack;
+
+
+
+    public TextMeshProUGUI b1Text;
 	public TextMeshProUGUI b2Text;
 	public TextMeshProUGUI b3Text;
 
@@ -71,14 +82,18 @@ public class BattleSystem : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-		if (MainMenuController.Instance.ListOfItemsEncounter1[1] == true)
+		if (MainMenuController.Instance.ListOfItemsEncounter1[0] == true)
 		{
 			b1Text.text = "Gun";
 		}
-		if (MainMenuController.Instance.ListOfItemsEncounter2[1] == true)
+		if (MainMenuController.Instance.ListOfItemsEncounter2[0] == true)
 		{
 			b2Text.text = "H.S.D";
 		}
+        if (MainMenuController.Instance.ListOfItemsEncounter3[0] == true)
+        {
+            b2Text.text = "Flame Thrower";
+        }
         itempanel.SetActive(false);
         state = BattleState.START;
 		StartCoroutine(SetupBattle());
@@ -106,7 +121,7 @@ public class BattleSystem : MonoBehaviour
 	IEnumerator GunAttack()
 	{
         bool isDead = enemyUnit.TakeDamage(playerUnit.damage * 3);
-
+        sourceGun.PlayOneShot(GUN);
         enemyHUD.SetHP(enemyUnit.currentHP);
         dialogueText.text = "The attack is successful!";
 
@@ -128,7 +143,7 @@ public class BattleSystem : MonoBehaviour
 	{
 		
 		bool isDead = enemyUnit.TakeDamage(playerUnit.damage);
-
+        attack.PlayOneShot(Attack);
 		enemyHUD.SetHP(enemyUnit.currentHP);
 		dialogueText.text = "The attack is successful!";
 
@@ -145,7 +160,87 @@ public class BattleSystem : MonoBehaviour
 		}
 	}
 
-	IEnumerator EnemyTurn()
+    public void Training()
+    {
+        state = BattleState.ENEMYTURN;
+        PlayerAttackTraining();
+    }
+
+    IEnumerator PlayerAttackTraining()
+	{
+        StartCoroutine(EnemyTurnTraining());
+        yield return new WaitForSeconds(0f);
+    }
+    IEnumerator EnemyTurnTraining()
+    {
+        bool isDead;
+        numofattcks = 0;
+        
+        
+        Startingpos = new Vector3(1, 1, 1);
+        transform.position = Startingpos;
+        MovePos = Startingpos;
+        MaxX = 15;
+        MaxY = 28;
+        MinX = -33;
+        MinY = -12;
+        Sensitivity = 2;
+        numofobst++;
+        Checker = 1;
+        checkme = 1;
+
+        if (numofobst == 1)
+        {
+            Obst1.SetActive(true);
+            Obst2.SetActive(false);
+            Obst3.SetActive(false);
+
+        }
+        else if (numofobst == 2)
+        {
+            Obst1.SetActive(false);
+            Obst2.SetActive(true);
+            Obst3.SetActive(false);
+
+        }
+        else if (numofobst == 3)
+        {
+            Obst1.SetActive(false);
+            Obst2.SetActive(false);
+            Obst3.SetActive(true);
+
+        }
+
+       
+
+
+        yield return new WaitForSeconds(10f);
+
+        
+        Checker = 0;
+        checkme = 0;
+
+
+        if (numofobst == 3)
+        {
+            numofobst = 0;
+        }
+
+        
+
+
+
+
+
+
+        state = BattleState.PLAYERTURN;
+        PlayerTurn();
+
+
+    }
+
+
+    IEnumerator EnemyTurn()
 	{
 		bool isDead;
 		numofattcks = 0;
@@ -231,17 +326,20 @@ public class BattleSystem : MonoBehaviour
 			dialogueText.text = "You won the battle!, you succesfully killed the entity though perhaps there was another way?";
             StartCoroutine(waitup());
             Scene scene1 = SceneManager.GetActiveScene();
-			MainMenuController.Instance.ViolentRoute[0] = true;
+			
             if (scene1.name == "Scene2Fight1")
             {
-                SceneManager.LoadScene("Scene5Encounter2");
+				MainMenuController.Instance.ViolentRoute[0] = true;
+                SceneManager.LoadScene("Scene4.5Encounter2Hall");
             }
             else if (scene1.name == "Scene6Fight2")
             {
+                MainMenuController.Instance.ViolentRoute[1] = true;
                 SceneManager.LoadScene("Scene9Encounter3ContainmentRoom");
             }
             else if (scene1.name == "Scene10Fight3")
             {
+                MainMenuController.Instance.ViolentRoute[2] = true;
                 SceneManager.LoadScene("ViolentEnding");
             }
         } else if (state == BattleState.LOST)
@@ -255,7 +353,7 @@ public class BattleSystem : MonoBehaviour
 			}
 			else if(scene.name == "Scene6Fight2")
 			{
-                SceneManager.LoadScene("Scene5Encounter2");
+                SceneManager.LoadScene("Scene4.5Encounter2");
             }
 			else if(scene.name == "Scene10Fight3")
 			{
@@ -351,6 +449,7 @@ public class BattleSystem : MonoBehaviour
             if (Apused)
 			{
 				itempanel.SetActive(false);
+                sourceGun.PlayOneShot(GUN);
                 StartCoroutine(GunAttack());
             }
 			else
@@ -389,6 +488,41 @@ public class BattleSystem : MonoBehaviour
             if (Apused)
             {
                 itempanel.SetActive(false);
+                sourceHSD.PlayOneShot(HSDso);
+                StartCoroutine(GunAttack());
+            }
+            else
+            {
+                dialogueText.text = "Im too tired to do that";
+                StartCoroutine(waitup());
+                return;
+            }
+
+        }
+        else
+        {
+            dialogueText.text = "I have nothing to use";
+            return;
+        }
+
+    }
+
+    public void Flame()
+    {
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
+        else if (MainMenuController.Instance.ListOfItemsEncounter3[0] == true)
+        {
+            Scene scene2 = SceneManager.GetActiveScene();
+            
+            bool Apused = playerUnit.APUse(6);
+            playerHUD.SetAP(playerUnit.currentAP);
+            if (Apused)
+            {
+                itempanel.SetActive(false);
+                sourceFlame.PlayOneShot(clipFlame);
                 StartCoroutine(GunAttack());
             }
             else

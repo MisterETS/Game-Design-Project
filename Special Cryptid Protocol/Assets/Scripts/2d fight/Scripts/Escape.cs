@@ -4,35 +4,61 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEditor.UI;
+
 using UnityEngine.EventSystems;
 
-using Unity.VisualScripting;
+
 
 public class Escape : MonoBehaviour
 {
     public Button buttonEsc;
-    public TMP_Text dialogueText; 
+    public Button buttonEscape1;
+    public Button buttonEscape2;
+    public Button buttonEscape3;
+    public TMP_Text dialogueText;
 
+    IEnumerator waitup()
+    {
 
+        yield return new WaitForSeconds(5f);
+    }
     IEnumerator wait()
     {
-        yield return new WaitForSeconds(5f);
+        Scene scene = SceneManager.GetActiveScene();
+        yield return new WaitForSeconds(0.5f);
+        if(MainMenuController.Instance.ListOfItemsEncounter1[2] == true && scene.name == "Scene1Encounter1")
+        {
+            dialogueText.text = "I feel bad about leaving without dealing with the creatures, but I need to look out for myself first.";
+            yield return new WaitForSeconds(5f);
+            SceneManager.LoadScene("Scene4.5Encounter2Hall");
+        }
+
+        if (MainMenuController.Instance.ListOfItemsEncounter2[2] == true && scene.name == "Scene4.5Encounter2Hall")
+        {
+            dialogueText.text = "You head through a secret entrance in the Janitors closet, escape is moments away. This mess is someone elses problem.";
+            yield return new WaitForSeconds(5f);
+            SceneManager.LoadScene("Scene9Encounter3ContainmentRoom");
+        }
+
+        if(MainMenuController.Instance.EscapeRoute[2] == true && scene.name == "Scene11MainHall")
+        {
+            SceneManager.LoadScene("EscapeEnding");
+        }
     }
 
     public void  EscapeVent()
     {
         if (MainMenuController.Instance.ListOfItemsEncounter1[2] == true)
         {
-            dialogueText.text = "I can get through here and escape that thing!";
+            MainMenuController.Instance.EscapeRoute[0] = true;
             StartCoroutine(wait());
-            SceneManager.LoadScene("Scene5Encounter2");
+           
 
 
         }
         else
         {
-            dialogueText.text = "I need something to get these screws off the vent.";
+            dialogueText.text = "I can escape from here without dealing with the subject, I just need a screwdriver for the bolts. Dunno if it's right to just leave without dealing with the problem.";
         }
     }
 
@@ -41,15 +67,17 @@ public class Escape : MonoBehaviour
     {
         if (MainMenuController.Instance.ListOfItemsEncounter2[2] == true)
         {
-            dialogueText.text = "I can get through here and escape that thing!";
+            dialogueText.text = "I feel bad about leaving without dealing with the creatures, but I need to look out for myself first.";
+            StartCoroutine(waitup());
+            MainMenuController.Instance.EscapeRoute[1] = true;
             StartCoroutine(wait());
-            SceneManager.LoadScene("Scene9Encounter3ContainmentRoom");
+            
 
 
         }
         else
         {
-            dialogueText.text = "I need a keycard to open this door.";
+            dialogueText.text = "I need a keycard to open this door, the cleanup crew can deal with this after im out.";
         }
     }
 
@@ -58,9 +86,11 @@ public class Escape : MonoBehaviour
     {
         if (MainMenuController.Instance.ListOfItemsEncounter3[2] == true)
         {
-            dialogueText.text = "I can get through here and escape that thing!";
+            dialogueText.text = "You head through a secret entrance in the Janitors closet, escape is moments away. This mess is someone elses problem.";
+            StartCoroutine(waitup());
+            MainMenuController.Instance.EscapeRoute[2] = true;
             StartCoroutine(wait());
-            SceneManager.LoadScene("EscapeEnding");
+            
 
 
         }
@@ -74,24 +104,46 @@ public class Escape : MonoBehaviour
     public void ScrewDriver()
     {
         MainMenuController.Instance.ListOfItemsEncounter1[2] = true;
-        dialogueText.text = "I could use this to get through that vent!";
-        buttonEsc.interactable = false;
+        dialogueText.text = "Look like this has a screwdriver, should come in handy.";
+        buttonEscape1.interactable = false;
+        buttonEscape1.GetComponent<Image>().enabled = false;
     }
 
     public void KeyCard()
     {
         MainMenuController.Instance.ListOfItemsEncounter2[2] = true;
-        dialogueText.text = "I could use the keycard to get through that door!";
+        dialogueText.text = "The janitors keycard, this must have been the last place he was cleaning before he went missing.";
         buttonEsc.interactable = false;
+        buttonEscape1.GetComponent<Image>().enabled = false;
     }
 
     public void Power()
     {
         MainMenuController.Instance.ListOfItemsEncounter3[2] = true;
         dialogueText.text = "The power is on, finally i can get out of here!";
-        buttonEsc.interactable = false;
+        buttonEscape1.interactable = false;
+        buttonEscape1.GetComponent<Image>().enabled = false;
     }
 
+    private void Start()
+    {
+        if (MainMenuController.Instance.ListOfItemsEncounter1[2] == true)
+        {
+            buttonEscape1.interactable = false;
+            buttonEscape1.GetComponent<Image>().enabled = false;
+        }
 
+        if (MainMenuController.Instance.ListOfItemsEncounter2[2] == true)
+        {
+            buttonEscape2.interactable = false;
+            buttonEscape1.GetComponent<Image>().enabled = false;
+        }
+
+         if (MainMenuController.Instance.ListOfItemsEncounter3[2] == true )
+         {
+            buttonEscape3.interactable = false;
+            buttonEscape1.GetComponent<Image>().enabled = false;
+        }
+    }
 
 }

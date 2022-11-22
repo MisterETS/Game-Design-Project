@@ -18,7 +18,7 @@ public class MainMenuController : MonoBehaviour
     //There are 3 scenes so far , so it needs to be discussed on how the endings will be obtained
     private void Start()
     {
-        ListOfItemsEncounter1[0] = false;
+       /* ListOfItemsEncounter1[0] = false;
         ListOfItemsEncounter1[1] = false;
         ListOfItemsEncounter1[2] = false;
         ListOfItemsEncounter1[3] = false;
@@ -47,7 +47,7 @@ public class MainMenuController : MonoBehaviour
 
         EscapeRoute[0] = false;
         EscapeRoute[1] = false;
-        EscapeRoute[2] = false;
+        EscapeRoute[2] = false;*/
     }
 
     
@@ -64,8 +64,14 @@ public class MainMenuController : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(this);
+        Scene scene1 = SceneManager.GetActiveScene();
 
+    }
+
+    private void Update()
+    {
        
     }
+
 
 }

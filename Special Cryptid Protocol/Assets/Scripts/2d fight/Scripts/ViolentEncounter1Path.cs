@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEditor.UI;
+
 using UnityEngine.EventSystems;
-using Unity.VisualScripting;
+
 
 
 public class ViolentEncounter1Path : MonoBehaviour
@@ -23,10 +23,11 @@ public class ViolentEncounter1Path : MonoBehaviour
 
     public void GunItem()
     {
-        dialogueText.text = "It appears that in the armory a gun was left behind in the panic, perhaps you can make use of it.";
+        dialogueText.text = "With this I can fight the monsters, though I wonder if there isn't a better option to deal with them.";
         MainMenuController.Instance.ListOfItemsEncounter1[0] = true;
         //Must have code that shows item was picked up
         GunButton.interactable = false;
+        GunButton.GetComponent<Image>().enabled = false;
     }
 
     public void LeaveScene()
@@ -36,18 +37,41 @@ public class ViolentEncounter1Path : MonoBehaviour
 
     public void HIghSonicDeviceItem()
     {
-        dialogueText.text = "It appears that this device as described from its manual is used to lethally take out creatures that can hear well, most likely that is for the feline creature.";
+        dialogueText.text = "A high frequency emitter, while it isn't perceivable to the human ear this tone will shut down the brain function of those who can perceive it, for emergancy use only.";
         MainMenuController.Instance.ListOfItemsEncounter2[0] = true;
         //Must have code that shows item was picked up
         HighSonicDeviceButton.interactable = false;
+        HighSonicDeviceButton.GetComponent<Image>().enabled = false;
     }
 
     public void IncedinaryItem()
     {
-        dialogueText.text = "It appears that this device as described from its manual is used to burn organic material at around 678 C, i think this will work more than well against that abomination";
+        dialogueText.text = "You pick up the Incendary Device from the shredded up corpse of a guard, a handheld flamethrower";
         MainMenuController.Instance.ListOfItemsEncounter3[0] = true;
         //Must have code that shows item was picked up
         IncedinaryDevice.interactable = false;
+        IncedinaryDevice.GetComponent<Image>().enabled = false;
+    }
+
+
+    private void Update()
+    {
+        if(MainMenuController.Instance.ListOfItemsEncounter1[0] == true)
+        {
+            GunButton.interactable = false;
+            if (MainMenuController.Instance.ListOfItemsEncounter2[0] == true)
+            {
+                HighSonicDeviceButton.interactable = false;
+                if (MainMenuController.Instance.ListOfItemsEncounter3[0] == true)
+                {
+                    IncedinaryDevice.interactable = false;
+                }
+            }
+        }
+
+
+        
+        
     }
 
 

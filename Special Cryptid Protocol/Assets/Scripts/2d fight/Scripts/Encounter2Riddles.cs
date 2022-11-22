@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEditor.UI;
+
 using UnityEngine.EventSystems;
 
 using Unity.VisualScripting;
@@ -33,7 +33,7 @@ public class Encounter2Riddles : MonoBehaviour
         Talk.interactable = false;
         Dialoguetext.text = "Welcome , in order to pass , you need to answer my riddles, get one wrong and you will be long gone!";
         yield return new WaitForSeconds(5f);
-        Dialoguetext.text = "Your first riddle is..."; //add here 
+        Dialoguetext.text = "Your first riddle is 'WHAT DEAR BOY, IS FOOLISH AND RUDE, AND IF IT DOESN'T RUN SHALL BE FOOD?' "; //add here 
         Panel.SetActive(true);
     }
 
